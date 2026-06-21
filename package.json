@@ -1,0 +1,13 @@
+{
+  "name": "vennperio-hub",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build-announcements.mjs",
+    "check": "node scripts/build-announcements.mjs --check && node --check public/app.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

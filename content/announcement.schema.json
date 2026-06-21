@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hub.vennperio.site/schemas/announcement.schema.json",
+  "title": "Comunicado do Vennperio",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "id",
+    "version",
+    "type",
+    "severity",
+    "title",
+    "message",
+    "publishedAt",
+    "startsAt",
+    "endsAt",
+    "expiresAt",
+    "dismissible",
+    "active"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "version": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 32
+    },
+    "type": {
+      "enum": [
+        "development",
+        "update",
+        "maintenance",
+        "incident"
+      ]
+    },
+    "severity": {
+      "enum": [
+        "info",
+        "warning",
+        "critical"
+      ]
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 80
+    },
+    "message": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 240
+    },
+    "details": {
+      "type": "string",
+      "maxLength": 1000
+    },
+    "publishedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "startsAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "endsAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "expiresAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "dismissible": {
+      "type": "boolean"
+    },
+    "active": {
+      "type": "boolean"
+    }
+  }
+}

@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Comunicados oficiais e status de desenvolvimento do Vennperio.">
+    <meta name="theme-color" content="#050a12">
+    <title>Vennperio Hub</title>
+    <link rel="stylesheet" href="/styles.css">
+    <script type="module" src="/app.js"></script>
+</head>
+<body>
+    <main class="hub">
+        <header class="hero">
+            <div>
+                <p class="eyebrow">Canal oficial</p>
+                <h1>Vennperio Hub</h1>
+                <p class="hero__description">Comunicados, atualizações e manutenções do Vennperio.</p>
+            </div>
+            <div class="product-status" aria-label="Status atual do produto">
+                <span class="product-status__signal" aria-hidden="true"></span>
+                <span>
+                    <strong id="productVersion">Alpha</strong>
+                    <small id="productStatus">Em desenvolvimento</small>
+                </span>
+            </div>
+        </header>
+
+        <section class="announcements" aria-labelledby="announcementsTitle">
+            <div class="section-heading">
+                <div>
+                    <p class="eyebrow">Newsletter</p>
+                    <h2 id="announcementsTitle">Comunicados</h2>
+                </div>
+                <span id="announcementCount" class="count" aria-live="polite"></span>
+            </div>
+
+            <div id="announcementList" class="announcement-list" aria-live="polite">
+                <article class="announcement-card announcement-card--loading">
+                    <p>Carregando comunicados...</p>
+                </article>
+            </div>
+        </section>
+
+        <footer>
+            <span>Vennperio</span>
+            <a href="https://github.com/UVV-CC1N-26-P3/Vennperio" rel="noopener noreferrer">Código do jogo</a>
+        </footer>
+    </main>
+</body>
+</html>

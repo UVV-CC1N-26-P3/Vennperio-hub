@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "channel": "alpha",
+  "product": {
+    "name": "Vennperio",
+    "version": "alpha",
+    "status": "Em desenvolvimento"
+  },
+  "announcements": [
+    {
+      "id": "alpha-em-desenvolvimento",
+      "version": "alpha",
+      "type": "development",
+      "severity": "info",
+      "title": "Vennperio Alpha",
+      "message": "Em desenvolvimento",
+      "details": "Esta é uma versão Alpha. Recursos, desempenho, interface e regras ainda podem mudar durante o desenvolvimento.",
+      "publishedAt": "2026-06-21T00:00:00-03:00",
+      "startsAt": null,
+      "endsAt": null,
+      "expiresAt": null,
+      "dismissible": true,
+      "active": true
+    }
+  ]
+}
