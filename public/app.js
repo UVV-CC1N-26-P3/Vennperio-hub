@@ -7,6 +7,12 @@ const dateFormatter = new Intl.DateTimeFormat("pt-BR", {
     dateStyle: "medium",
     timeZone: "America/Sao_Paulo"
 });
+const changeCategoryLabels = {
+    added: "Adicionado",
+    changed: "Alterado",
+    fixed: "Corrigido",
+    knownIssues: "Problemas conhecidos"
+};
 
 loadAnnouncements();
 
@@ -52,7 +58,7 @@ function renderProduct(product) {
     productStatus.textContent = normalizeText(product.status, "Em desenvolvimento");
 }
 
-function renderAnnouncements(announcements) {
+export function renderAnnouncements(announcements) {
     announcementList.replaceChildren();
     announcementCount.textContent = `${announcements.length} comunicado${announcements.length === 1 ? "" : "s"}`;
 
@@ -69,16 +75,15 @@ function renderAnnouncements(announcements) {
     }
 }
 
-function createAnnouncementCard(announcement) {
+export function createAnnouncementCard(announcement) {
     const article = document.createElement("article");
     const metadata = document.createElement("div");
     const badge = document.createElement("span");
     const version = document.createElement("span");
     const publishedAt = document.createElement("time");
-    const title = document.createElement("h3");
-    const message = document.createElement("p");
 
     article.className = "announcement-card";
+    article.id = `announcement-${announcement.id}`;
     article.dataset.severity = normalizeSeverity(announcement.severity);
     metadata.className = "announcement-card__meta";
     badge.className = "announcement-card__badge";
@@ -86,12 +91,26 @@ function createAnnouncementCard(announcement) {
     version.textContent = normalizeText(announcement.version, "Alpha");
     publishedAt.dateTime = announcement.publishedAt;
     publishedAt.textContent = formatDate(announcement.publishedAt);
-    title.textContent = normalizeText(announcement.title, "Comunicado");
-    message.className = "announcement-card__message";
-    message.textContent = normalizeText(announcement.message, "");
 
     metadata.append(badge, version, publishedAt);
-    article.append(metadata, title, message);
+    article.append(metadata);
+
+    if (typeof announcement.title === "string" && announcement.title.trim()) {
+        const title = document.createElement("h3");
+
+        title.textContent = announcement.title.trim();
+        article.append(title);
+    }
+
+    if (typeof announcement.message === "string" && announcement.message.trim()) {
+        const message = document.createElement("p");
+
+        message.className = "announcement-card__message";
+        message.textContent = announcement.message.trim();
+        article.append(message);
+    }
+
+    appendHighlights(article, announcement.highlights);
 
     if (typeof announcement.details === "string" && announcement.details.trim()) {
         const details = document.createElement("p");
@@ -101,7 +120,73 @@ function createAnnouncementCard(announcement) {
         article.append(details);
     }
 
+    appendChangelog(article, announcement.changes);
+
     return article;
+}
+
+function appendHighlights(article, highlights) {
+    if (!Array.isArray(highlights) || highlights.length === 0) {
+        return;
+    }
+
+    const section = document.createElement("section");
+    const heading = document.createElement("h4");
+
+    section.className = "announcement-card__highlights";
+    heading.textContent = "Destaques";
+    section.append(heading, createTextList(highlights));
+    article.append(section);
+}
+
+function appendChangelog(article, changes) {
+    if (!changes || typeof changes !== "object") {
+        return;
+    }
+
+    const categories = Object.entries(changeCategoryLabels)
+        .filter(([key]) => Array.isArray(changes[key]) && changes[key].length > 0);
+
+    if (categories.length === 0) {
+        return;
+    }
+
+    const section = document.createElement("section");
+    const heading = document.createElement("h4");
+
+    section.className = "announcement-card__changelog";
+    heading.className = "announcement-card__section-title";
+    heading.textContent = "Changelog";
+    section.append(heading);
+
+    for (const [key, label] of categories) {
+        const group = document.createElement("div");
+        const categoryHeading = document.createElement("h5");
+
+        group.className = "announcement-card__change-group";
+        categoryHeading.textContent = label;
+        group.append(categoryHeading, createTextList(changes[key]));
+        section.append(group);
+    }
+
+    article.append(section);
+}
+
+function createTextList(items) {
+    const list = document.createElement("ul");
+
+    for (const value of items) {
+        if (typeof value !== "string" || !value.trim()) {
+            continue;
+        }
+
+        const item = document.createElement("li");
+
+        item.textContent = value.trim();
+        list.append(item);
+    }
+
+    return list;
 }
 
 function renderError() {

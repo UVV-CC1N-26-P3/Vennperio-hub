@@ -10,6 +10,7 @@ const outputDirectory = path.join(projectDirectory, "public", "api", "v1");
 const outputPath = path.join(outputDirectory, "announcements.json");
 const allowedTypes = new Set(["development", "update", "maintenance", "incident"]);
 const allowedSeverities = new Set(["info", "warning", "critical"]);
+const allowedChangeCategories = new Set(["added", "changed", "fixed", "knownIssues"]);
 const checkOnly = process.argv.includes("--check");
 
 const files = (await readdir(announcementsDirectory))
@@ -68,8 +69,10 @@ function validateAnnouncement(announcement, file) {
 
     requireString(announcement, "id", file, 80);
     requireString(announcement, "version", file, 32);
-    requireString(announcement, "title", file, 80);
-    requireString(announcement, "message", file, 240);
+    validateOptionalString(announcement, "title", file, 80);
+    validateOptionalString(announcement, "message", file, 240);
+    validateOptionalStringArray(announcement, "highlights", file, 5, 120);
+    validateOptionalChanges(announcement, file);
 
     if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(announcement.id)) {
         throw new Error(`${file}: "id" deve usar letras minúsculas, números e hífens.`);
@@ -104,6 +107,8 @@ function validateAnnouncement(announcement, file) {
         "title",
         "message",
         "details",
+        "highlights",
+        "changes",
         "publishedAt",
         "startsAt",
         "endsAt",
@@ -136,6 +141,55 @@ function validateOptionalString(value, key, file, maxLength) {
 
     if (typeof value[key] !== "string" || value[key].length > maxLength) {
         throw new Error(`${file}: "${key}" deve ser um texto de até ${maxLength} caracteres.`);
+    }
+}
+
+function validateOptionalStringArray(value, key, file, maxItems, maxLength) {
+    if (value[key] === undefined) {
+        return;
+    }
+
+    if (!Array.isArray(value[key])
+        || value[key].length === 0
+        || value[key].length > maxItems) {
+        throw new Error(`${file}: "${key}" deve conter entre 1 e ${maxItems} itens.`);
+    }
+
+    const uniqueItems = new Set();
+
+    for (const item of value[key]) {
+        if (typeof item !== "string"
+            || item.trim().length === 0
+            || item.length > maxLength) {
+            throw new Error(
+                `${file}: cada item de "${key}" deve ser um texto preenchido de até ${maxLength} caracteres.`
+            );
+        }
+
+        if (uniqueItems.has(item)) {
+            throw new Error(`${file}: "${key}" não pode conter itens duplicados.`);
+        }
+
+        uniqueItems.add(item);
+    }
+}
+
+function validateOptionalChanges(announcement, file) {
+    if (announcement.changes === undefined) {
+        return;
+    }
+
+    if (!isPlainObject(announcement.changes)
+        || Object.keys(announcement.changes).length === 0) {
+        throw new Error(`${file}: "changes" deve conter ao menos uma categoria.`);
+    }
+
+    for (const category of Object.keys(announcement.changes)) {
+        if (!allowedChangeCategories.has(category)) {
+            throw new Error(`${file}: categoria de changelog desconhecida "${category}".`);
+        }
+
+        validateOptionalStringArray(announcement.changes, category, file, 50, 240);
     }
 }
 
